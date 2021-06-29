@@ -2,18 +2,20 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/rnrudxo2872/GoCoin/blockchain"
+	"log"
+	"net/http"
 )
 
-func main() {
-	chain := blockchain.GetBlockchain()
-	chain.AddBlock("Seconde Block")
-	chain.AddBlock("세번째 블록")
+var port string = ":4000"
 
-	for _, block := range chain.GetAllBlock() {
-		fmt.Println("Data : " + block.Data)
-		fmt.Println("Hash : " + block.Hash)
-		fmt.Println("PrevHash : " + block.PrevHash)
-	}
+func handleHome(rw http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(rw, "Hello! Go Server!")
+
+}
+
+func main() {
+	http.HandleFunc("/", handleHome)
+
+	fmt.Printf("Now Listening Server! http://localhost%s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
