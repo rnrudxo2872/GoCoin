@@ -1,7 +1,37 @@
 package main
 
-import "github.com/rnrudxo2872/GoCoin/explorer"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/rnrudxo2872/GoCoin/utils"
+)
+
+const port string = ":4000"
+
+type URLDescription struct {
+	URL         string
+	Method      string
+	Description string
+}
+
+func document(rw http.ResponseWriter, r *http.Request) {
+	data := []URLDescription{
+		{
+			URL:         "/",
+			Method:      "GET",
+			Description: "See Documentation",
+		},
+	}
+	b, err := json.Marshal(data)
+	utils.HandleErr(err)
+	fmt.Printf("%s\n", b)
+}
 
 func main() {
-	explorer.Start()
+	http.HandleFunc("/", document)
+	fmt.Printf("Listening on http://localhost%s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
