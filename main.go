@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/rnrudxo2872/GoCoin/utils"
 )
 
 const port string = ":4000"
 
 type URLDescription struct {
-	URL         string
-	Method      string
-	Description string
+	URL         string `json:"url"`
+	Method      string `json:"-"`
+	Description string `json:"description"`
+	Payload     string `json:"payload,omitempty"`
 }
 
 func document(rw http.ResponseWriter, r *http.Request) {
@@ -24,10 +23,15 @@ func document(rw http.ResponseWriter, r *http.Request) {
 			Method:      "GET",
 			Description: "See Documentation",
 		},
+		{
+			URL:         "/blocks",
+			Method:      "POST",
+			Description: "Add A Block",
+			Payload:     "12DQW2F41124",
+		},
 	}
-	b, err := json.Marshal(data)
-	utils.HandleErr(err)
-	fmt.Printf("%s\n", b)
+	rw.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(data)
 }
 
 func main() {
