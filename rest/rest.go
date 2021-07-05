@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/rnrudxo2872/GoCoin/blockchain"
 	"github.com/rnrudxo2872/GoCoin/utils"
 )
@@ -64,15 +65,22 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
 		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
 		rw.WriteHeader(http.StatusCreated)
+	default:
+		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
 
+func block(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 }
 
 func Start(aPort int) {
-	handler := http.NewServeMux()
+	router := mux.NewRouter()
 	port = fmt.Sprintf(":%d", aPort)
-	handler.HandleFunc("/", document)
-	handler.HandleFunc("/blocks", blocks)
+	router.HandleFunc("/", document).Methods("GET")
+	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
+	router.HandleFunc("/blocks/{id:[0-9]+}", block).Methods("GET")
 	fmt.Printf("Listening on http://localhost%s", port)
-	log.Fatal(http.ListenAndServe(port, handler))
+	log.Fatal(http.ListenAndServe(port, router))
 }
